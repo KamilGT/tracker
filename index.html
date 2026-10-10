@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Tracker MVP</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container header__container">
+            <h1 class="header__logo">Media Tracker</h1>
+            <button class="btn btn--primary" id="addItemBtn">+ Добавить</button>
+            <button class="btn btn--icon" id="mobileMenuBtn" aria-label="Открыть меню">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main -->
+    <main class="main">
+        <div class="container main__container">
+            <!-- Sidebar / Navigation -->
+            <aside class="sidebar" id="sidebar">
+                <nav class="nav">
+                    <div class="nav__group">
+                        <button class="nav__item nav__item--active" data-section="all">Все</button>
+                        <button class="nav__item" data-section="planned">В планах</button>
+                        <button class="nav__item" data-section="in_progress">В процессе</button>
+                        <button class="nav__item" data-section="completed">Завершено</button>
+                    </div>
+                    <div class="nav__group nav__group--collection">
+                        <span class="nav__label">Моя подборка</span>
+                        <button class="nav__item nav__item--collection" data-section="favorites">
+                            <svg class="nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 1 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                            </svg>
+                            <span>Избранное</span>
+                        </button>
+                    </div>
+                </nav>
+            </aside>
+
+            <!-- Content -->
+            <section class="content">
+                <!-- Filters -->
+                <div class="filters">
+                    <input type="text" class="input" id="searchInput" placeholder="Поиск по названию...">
+                    <select class="select" id="typeFilter">
+                        <option value="all">Все типы</option>
+                        <option value="movie">Фильм</option>
+                        <option value="series">Сериал</option>
+                        <option value="book">Книга</option>
+                        <option value="anime">Аниме</option>
+                    </select>
+                    <select class="select" id="statusFilter">
+                        <option value="all">Все статусы</option>
+                        <option value="planned">В планах</option>
+                        <option value="in_progress">В процессе</option>
+                        <option value="completed">Завершено</option>
+                    </select>
+                </div>
+
+                <!-- Section Title -->
+                <h2 class="section__title" id="sectionTitle">Все</h2>
+
+                <!-- Items List -->
+                <div class="items" id="itemsList" aria-live="polite"></div>
+                <div class="empty" id="emptyState" style="display: none;">
+                    <p id="emptyMessage">Пока нет записей</p>
+                    <button class="btn btn--secondary" id="resetFiltersBtn" style="display: none;">Сбросить фильтры</button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Modal for Add/Edit -->
+    <div class="modal" id="itemModal" role="dialog" aria-modal="true" tabindex="-1">
+        <div class="modal__backdrop" id="modalBackdrop"></div>
+        <div class="modal__content" role="document">
+            <div class="modal__header">
+                <h3 class="modal__title" id="modalTitle">Добавить запись</h3>
+                <button class="modal__close" id="modalClose" aria-label="Закрыть">&times;</button>
+            </div>
+            <form class="modal__form" id="itemForm" novalidate>
+                <input type="hidden" id="itemId">
+                
+                <div class="form__group">
+                    <label class="form__label" for="itemTitle">Название *</label>
+                    <input type="text" class="input" id="itemTitle" required>
+                </div>
+
+                <div class="form__row">
+                    <div class="form__group">
+                        <label class="form__label" for="itemType">Тип *</label>
+                        <select class="select" id="itemType" required>
+                            <option value="">Выбрать...</option>
+                            <option value="movie">Фильм</option>
+                            <option value="series">Сериал</option>
+                            <option value="book">Книга</option>
+                            <option value="anime">Аниме</option>
+                        </select>
+                    </div>
+
+                    <div class="form__group">
+                        <label class="form__label" for="itemStatus">Статус *</label>
+                        <select class="select" id="itemStatus" required>
+                            <option value="">Выбрать...</option>
+                            <option value="planned">В планах</option>
+                            <option value="in_progress">В процессе</option>
+                            <option value="completed">Завершено</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form__group">
+                    <label class="form__label" for="itemRating">Оценка (1-10)</label>
+                    <input type="number" class="input" id="itemRating" min="1" max="10" step="1" placeholder="Напр. 9">
+                </div>
+
+                <div class="form__group">
+                    <label class="form__label" for="itemNote">Личная заметка/впечатление</label>
+                    <textarea class="textarea" id="itemNote" rows="4" placeholder="Мои мысли..."></textarea>
+                </div>
+
+                <div class="form__group form__group--checkbox">
+                    <label class="checkbox__label">
+                        <input type="checkbox" id="itemFavorite">
+                        <span>Избранное</span>
+                    </label>
+                </div>
+
+                <div class="modal__actions">
+                    <button type="button" class="btn btn--secondary" id="modalCancel">Отмена</button>
+                    <button type="submit" class="btn btn--primary" id="modalSave">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
